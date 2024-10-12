@@ -60,15 +60,15 @@ function onEdit(event: GoogleAppsScript.Events.SheetsOnEdit) {
   Logger.log(`Config: ${JSON.stringify(config)}`);
   const result = check(event, config);
   if (result) {
-    const { cell } = result;
-    const date = new Date();
-    Logger.log(`Setting the date and time: ${date}`);
-    cell.setValue(date);
+    const { cell, sheet } = result;
+    insertDateTime(cell);
+    addNewRow(cell, sheet);
   }
 }
 
 type CheckResult = {
   readonly cell: GoogleAppsScript.Spreadsheet.Range;
+  readonly sheet: GoogleAppsScript.Spreadsheet.Sheet;
 };
 
 /**
@@ -99,7 +99,7 @@ function check(
             `Not doing anything since some of the cells are still blank!`
           );
         } else {
-          return { cell: dateCell };
+          return { cell: dateCell, sheet };
         }
       } else {
         Logger.log(`Not doing anything since date and time are already set!`);
@@ -111,4 +111,19 @@ function check(
     Logger.log("Not doing anything since it is not the right sheet!");
   }
   return false;
+}
+
+function insertDateTime(cell: GoogleAppsScript.Spreadsheet.Range) {
+  const date = new Date();
+  Logger.log(`Setting the date and time: ${date}`);
+  cell.setValue(date);
+}
+
+function addNewRow(cell: GoogleAppsScript.Spreadsheet.Range, sheet: GoogleAppsScript.Spreadsheet.Sheet) {
+  if (cell.getRow() === sheet.getLastRow()) {
+    Logger.log(
+      `Cell is the last row, adding a new row: cell.row=${cell.getRow()}, sheet.lastRow=${sheet.getLastRow()}`
+    );
+    sheet.insertRowAfter(sheet.getLastRow());
+  }
 }
