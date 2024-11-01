@@ -23,6 +23,8 @@ type Config = {
     /** The indices of the columns to watch for edits. */
     readonly toWatch: ReadonlyArray<number>;
   };
+  /** Insert a new row at the given position. */
+  readonly insertRowAt: 'first' | 'last';
   /** The sheet to watch. */
   readonly sheet: {
     /** The name of the sheet to watch. */
@@ -41,8 +43,9 @@ function getConfig(): Config {
       date: 1, // the column to set the date and time. E.g., the first column
       toWatch: [2, 3, 4], // the columns to watch for edits. E.g., second column is systolic, third column is diastolic, and fourth column is pulse.
     },
+    insertRowAt: 'first',
     sheet: {
-      name: "Readings", // the name of the sheet that contains the blood pressure readings
+      name: 'Readings', // the name of the sheet that contains the blood pressure readings
     },
   };
 }
@@ -63,7 +66,7 @@ function onEdit(event: GoogleAppsScript.Events.SheetsOnEdit) {
   if (result) {
     const { cell, sheet } = result;
     insertDateTime(cell);
-    addNewRow(cell, sheet);
+    addNewRow(cell, sheet, config);
   }
 }
 
@@ -82,7 +85,7 @@ type CheckResult = {
  */
 function check(
   event: GoogleAppsScript.Events.SheetsOnEdit,
-  config: Config
+  config: Config,
 ): CheckResult | false {
   const sheet = event.source.getActiveSheet();
   Logger.log(`Sheet: name=${sheet.getName()}`);
@@ -97,19 +100,19 @@ function check(
         });
         if (hasBlanks) {
           Logger.log(
-            `Not doing anything since some of the cells are still blank!`
+            'Not doing anything since some of the cells are still blank!',
           );
         } else {
           return { cell: dateCell, sheet };
         }
       } else {
-        Logger.log(`Not doing anything since date and time are already set!`);
+        Logger.log('Not doing anything since date and time are already set!');
       }
     } else {
-      Logger.log(`Not doing anything since it is not the right column!`);
+      Logger.log('Not doing anything since it is not the right column!');
     }
   } else {
-    Logger.log("Not doing anything since it is not the right sheet!");
+    Logger.log('Not doing anything since it is not the right sheet!');
   }
   return false;
 }
@@ -120,11 +123,17 @@ function insertDateTime(cell: GoogleAppsScript.Spreadsheet.Range) {
   cell.setValue(date);
 }
 
-function addNewRow(cell: GoogleAppsScript.Spreadsheet.Range, sheet: GoogleAppsScript.Spreadsheet.Sheet) {
-  if (cell.getRow() === sheet.getLastRow()) {
+function addNewRow(
+  cell: GoogleAppsScript.Spreadsheet.Range,
+  sheet: GoogleAppsScript.Spreadsheet.Sheet,
+  config: Config,
+) {
+  const row = config.insertRowAt === 'first' ? 1 : sheet.getLastRow();
+  // assuming that the first row is the header, then the cell row should be 2
+  if (cell.getRow() === (config.insertRowAt === 'first' ? row + 1 : row)) {
     Logger.log(
-      `Cell is the last row, adding a new row: cell.row=${cell.getRow()}, sheet.lastRow=${sheet.getLastRow()}`
+      `Cell is the ${config.insertRowAt} row, inserting a new row: cell.row=${cell.getRow()}, sheet.lastRow=${sheet.getLastRow()}`,
     );
-    sheet.insertRowAfter(sheet.getLastRow());
+    sheet.insertRowAfter(row);
   }
 }
