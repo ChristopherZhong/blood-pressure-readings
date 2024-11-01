@@ -53,6 +53,7 @@ function getConfig(): Config {
  * @param {GoogleAppsScript.Events.SheetsOnEdit} event The onEdit event.
  * @see https://developers.google.com/apps-script/guides/triggers#onedite
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function onEdit(event: GoogleAppsScript.Events.SheetsOnEdit) {
   Logger.log(`Processing onEdit ...`);
   Logger.log(`Event: ${JSON.stringify(event)}`);
