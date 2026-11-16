@@ -1,11 +1,25 @@
 {
+  "name": "blood-pressure-readings",
+  "version": "1.0.0",
+  "description": "This repository is a Google Apps Script project for a Google Sheet. The script automatically insert the current date and time after the readings (systolic, diastolic, and pulse) are added. It also inserts a new row after the readings.",
+  "homepage": "https://github.com/ChristopherZhong/blood-pressure-readings#readme",
+  "bugs": {
+    "url": "https://github.com/ChristopherZhong/blood-pressure-readings/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristopherZhong/blood-pressure-readings.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Christopher Zhong",
+  "type": "module",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@google/clasp": "^3.4.1",
     "@types/google-apps-script": "^2.0.15",
     "eslint": "^10.14.0",
     "prettier": "^3.10.1",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2"
   }
 }
